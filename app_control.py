@@ -4,11 +4,19 @@ import subprocess
 def close_application(app_name):
 
     apps = {
-        "calculator": "CalculatorApp.exe",
         "chrome": "chrome.exe",
         "paint": "mspaint.exe",
         "notepad": "notepad.exe"
     }
+
+    if app_name == "calculator":
+        subprocess.run(
+            "taskkill /f /im CalculatorApp.exe",
+            shell=True,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL
+        )
+        return "Closing calculator"
 
     if app_name in apps:
         subprocess.run(
