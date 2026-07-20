@@ -12,8 +12,13 @@ def wait_for_wake_word():
         recognizer.adjust_for_ambient_noise(source)
 
         while True:
+
             try:
-                audio = recognizer.listen(source)
+                audio = recognizer.listen(
+                    source,
+                    timeout=8,
+                    phrase_time_limit=5
+                )
 
                 text = recognizer.recognize_google(
                     audio,
@@ -22,7 +27,7 @@ def wait_for_wake_word():
 
                 text = text.lower()
 
-                print("Heard:", text)
+                print("Wake check:", text)
 
                 if "jarvis" in text:
                     return True

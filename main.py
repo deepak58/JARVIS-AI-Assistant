@@ -58,7 +58,7 @@ while True:
     print("CHECK:", command) #we can delete this later
     if command == "shutdown":
        break
-    elif any(phrase in command for phrase in ["goodbye","bye jarvis","jarvis stop","jarvis exit","stop","exit"]):
+    elif any(phrase in command for phrase in ["biogas","goodbye","good bye","bye jarvis","jarvis stop","jarvis exit","stop","exit","buy jarvis","buy jar","goodbye"]):
          speak("Goodbye Deepak.")
          break
 
