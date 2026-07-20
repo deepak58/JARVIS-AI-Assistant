@@ -1,6 +1,7 @@
 import speech_recognition as sr
 import pyttsx3
 from commands import execute_command
+from wake_word import wait_for_wake_word
 
 def speak(text):
     print("JARVIS:", text)
@@ -49,15 +50,15 @@ speak("Hello Deepak. I am Jarvis. System online.")
 
 while True:
 
+    wait_for_wake_word()
+
+    speak("Yes Deepak?")
+
     command = listen()
-    print("CHECK:", command)
+    print("CHECK:", command) #we can delete this later
     if command == "shutdown":
        break
-
-    if any(phrase in command for phrase in ["hello jarvis","hi jarvis","hey jarvis","hello","hi","hey"]):
-       speak("Hello Deepak. How can I help you?")
-
-    elif any(phrase in command for phrase in ["goodbye","bye jarvis","jarvis stop","jarvis exit","stop","exit","bye"]):
+    elif any(phrase in command for phrase in ["goodbye","bye jarvis","jarvis stop","jarvis exit","stop","exit"]):
          speak("Goodbye Deepak.")
          break
 
