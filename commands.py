@@ -64,6 +64,9 @@ def execute_command(command):
     elif "notepad" in command and "close" in command:
         return close_application("notepad")
     
+    elif "youtube" in command and "close" in command:
+        return close_application("chrome")
+    
     elif "close everything" in command:
         return close_all()
 
