@@ -1,67 +1,81 @@
-import speech_recognition as sr
-import pyttsx3
-from commands import execute_command
+from services.voice import speak, listen
+from commands.router import execute_command
 from wake_word import wait_for_wake_word
-
-def speak(text):
-    print("JARVIS:", text)
-
-    engine = pyttsx3.init()
-    engine.setProperty("rate", 155)
-
-    engine.say(text)
-    engine.runAndWait()
-
-    engine.stop()
-
-def listen():
-
-    recognizer = sr.Recognizer()
-
-    with sr.Microphone() as source:
-
-        print("Listening...")
-
-        recognizer.adjust_for_ambient_noise(source)
-
-        try:
-            audio = recognizer.listen(source, timeout=8)
-
-        except sr.WaitTimeoutError:
-            speak("Deepak, are you there?")
-
-            try:
-                audio = recognizer.listen(source, timeout=5)
-
-            except sr.WaitTimeoutError:
-                speak("Okay Deepak, I think you are busy with something else now. I am going offline. Call me when you need.")
-                return "shutdown"
-
-    try:
-        command = recognizer.recognize_google(audio, language="en-IN")
-        print("You said:", command)
-        return command.lower()
-
-    except:
-        return ""
+from config import WAKE_RESPONSES
+import random
+import time
 
 
-speak("Hello Deepak. I am Jarvis. System online.")
+def conversation_mode():
 
-while True:
+    speak(random.choice(WAKE_RESPONSES))
 
-    wait_for_wake_word()
+    time.sleep(0.5)
+    last_command_time = time.time() 
 
-    speak("Yes Deepak?")
+    while True:
 
-    command = listen()
-    print("CHECK:", command) #we can delete this later
-    if command == "shutdown":
-       break
-    elif any(phrase in command for phrase in ["biogas","goodbye","good bye","bye jarvis","jarvis stop","jarvis exit","stop","exit","buy jarvis","buy jar","goodbye"]):
-         speak("Goodbye Deepak.")
-         break
+        command = listen()
 
-    else:
+        print("COMMAND RECEIVED:", repr(command))
+
+
+        # No voice detected
+        if command == "":
+
+            # If inactive for 30 seconds
+            if time.time() - last_command_time > 30:
+
+                speak("Okay Deepak. I am going back to sleep. Call me when you need me.")
+
+                return
+
+            continue
+
+
+        # Update last activity time
+        last_command_time = time.time()
+
+        exit_phrases = {
+            "bye",
+            "goodbye",
+            "good bye",
+            "stop listening",
+            "exit conversation",
+            "bye bye",
+            "bye-bye"
+        }
+        if command in exit_phrases:
+            speak("Goodbye Deepak.")
+            return
+
+
         response = execute_command(command)
-        speak(response)
+
+        print("RESPONSE RECEIVED:", repr(response))
+
+        if response:
+            speak(response)
+
+def main():
+
+    speak("Hello Deepak. I am Jarvis. System online.")
+
+    while True:
+        wait_for_wake_word()
+        time.sleep(0.8)
+        conversation_mode()
+
+
+if __name__ == "__main__":
+    try:
+        main()
+
+    except KeyboardInterrupt:
+        print("\nJARVIS stopped by user.")
+
+    except Exception as error:
+        print("\nUnexpected error:", repr(error))
+
+    finally:
+        print("Closing Jarvis.")
